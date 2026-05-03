@@ -11,7 +11,23 @@ const { verifyTokenAndAdmin } = require("../middlewares/verifyToken"); // است
  * @access  public
  */
 router.get("/", asyncHandler(async (req, res) => {
-    const books = await Book.find(); 
+    const { minPrice, maxPrice } = req.query;
+    let books;
+    if (minPrice && maxPrice) {
+        books = await Book.find({
+            price: { $gte: minPrice, $lte: maxPrice }
+        }).populate("author", [
+            "_id",
+            "firstName",
+            "lastName",
+        ]);
+    } else {
+        books = await Book.find().populate("author", [
+            "_id",
+            "firstName",
+            "lastName",
+        ]);
+    }
     res.status(200).json(books);
 }));
 
